@@ -1,0 +1,6 @@
+app-store-web-scraper==0.2.0
+google-play-scraper==1.2.4
+# Transitive deps pinned to patched versions (CVE fixes — see pip-audit).
+idna>=3.15
+urllib3>=2.7.0
+certifi>=2024.7.4
