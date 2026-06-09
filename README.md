@@ -1,6 +1,6 @@
 # Review Scraper
 
-Pull Apple App Store & Google Play customer reviews into a CSV — runs locally on your Mac.
+A self-hosted Mac app that pulls Apple App Store & Google Play customer reviews into a CSV. 
 
 ## Getting started
 
