@@ -119,16 +119,46 @@ def scrape_google_reviews(app_id: str, country: str = 'us', language: str = 'en'
     print(f"Fetching Google Play Store reviews for: {app_id}")
     print(f"Country: {country}, Language: {language}, Star ratings: {star_ratings}")
     
-    # Fetch reviews
-    result, _ = reviews(
-        app_id,
-        lang=language,
-        country=country,
-        sort=Sort.NEWEST,
-        count=max_reviews
-    )
-    
-    # Filter by star rating
+    # google-play-scraper can filter by score *server-side* via filter_score_with,
+    # but only one score per call. The old code fetched the newest `max_reviews`
+    # of ALL ratings and discarded non-matching ones locally — so selecting only
+    # negative reviews spent most of the budget on positives that got thrown away
+    # (e.g. 500 fetched, 218 negatives kept). Instead, fetch each wanted score
+    # directly so the whole budget goes to the ratings you asked for.
+    def _fetch(score):
+        """Page through reviews (restricted to one star `score`, or all ratings
+        when score is None) until `max_reviews` are collected or the feed runs out."""
+        collected = []
+        token = None
+        while len(collected) < max_reviews:
+            batch, token = reviews(
+                app_id,
+                lang=language,
+                country=country,
+                sort=Sort.NEWEST,
+                count=min(200, max_reviews - len(collected)),
+                filter_score_with=score,
+                continuation_token=token,
+            )
+            collected.extend(batch)
+            if not batch or token is None:
+                break
+        return collected[:max_reviews]
+
+    if set(star_ratings) >= {1, 2, 3, 4, 5}:
+        # All ratings wanted: a single unfiltered pass preserves global newest order.
+        result = _fetch(None)
+    else:
+        # Fetch each wanted rating up to the budget, then keep the newest
+        # `max_reviews` across the combined set.
+        result = []
+        for score in sorted(star_ratings):
+            result.extend(_fetch(score))
+        result.sort(key=lambda r: r.get('at') or datetime.min, reverse=True)
+        result = result[:max_reviews]
+
+    # Build rows. The score/date checks below are now largely redundant
+    # (filtering already happened above) but kept as a safety net.
     filtered_reviews = [
         {
             'store': 'Google Play Store',
