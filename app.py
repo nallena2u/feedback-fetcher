@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Review Scraper – local web frontend.
+Feedback Fetcher – local web frontend.
 
-A self-contained (stdlib-only) web UI for review_scraper.py. Run it and a
+A self-contained (stdlib-only) web UI for feedback_fetcher.py. Run it and a
 browser window opens with a form to pick apps, star ratings, country, date,
 etc. Results are saved as a CSV in this folder and shown in a table.
 
 Usage:
     python app.py            # opens http://127.0.0.1:8765 in your browser
 
-No dependencies beyond what review_scraper.py already needs.
+No dependencies beyond what feedback_fetcher.py already needs.
 """
 import json
 import os
@@ -23,13 +23,13 @@ from datetime import datetime, date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, unquote, parse_qs
 
-# Where review_scraper.py lives (alongside this file, or inside the PyInstaller
+# Where feedback_fetcher.py lives (alongside this file, or inside the PyInstaller
 # bundle when frozen) and where CSVs should be written.
 if getattr(sys, "frozen", False):
     # Running as a bundled .app: import from the bundle, but save CSVs somewhere
     # the user can actually find and the app can write to.
     MODULE_DIR = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(sys.executable)))
-    BASE_DIR = os.path.join(os.path.expanduser("~"), "Documents", "Review Scraper Output")
+    BASE_DIR = os.path.join(os.path.expanduser("~"), "Documents", "Feedback Fetcher Output")
     os.makedirs(BASE_DIR, exist_ok=True)
 else:
     MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +39,7 @@ os.chdir(BASE_DIR)
 if MODULE_DIR not in sys.path:
     sys.path.insert(0, MODULE_DIR)
 
-from review_scraper import (
+from feedback_fetcher import (
     scrape_apple_reviews,
     scrape_google_reviews,
     export_to_csv,
@@ -51,13 +51,13 @@ PREFERRED_PORTS = (8765, 8766, 8767)  # try these first, then any free port
 # Version + update check (Option B: notify, don't auto-install).
 # Bump VERSION on every release you build. To enable update notifications, host a
 # small JSON file and put its public URL in DEFAULT_UPDATE_URL (or set the env var):
-#   {"version": "1.1.0", "url": "https://.../Review Scraper.zip", "notes": "What's new"}
+#   {"version": "1.1.0", "url": "https://.../Feedback Fetcher.zip", "notes": "What's new"}
 # On launch the app fetches it; if the version is newer, the page shows a banner
 # with a download link. No code is downloaded or run — only a version string + URL.
 # Leave the URL empty to disable the check entirely (no network call, no banner).
 VERSION = "1.0.0"
 DEFAULT_UPDATE_URL = "https://raw.githubusercontent.com/nallena2u/feedback-fetcher/main/version.json"
-UPDATE_URL = os.environ.get("REVIEW_SCRAPER_UPDATE_URL", "").strip() or DEFAULT_UPDATE_URL
+UPDATE_URL = os.environ.get("FEEDBACK_FETCHER_UPDATE_URL", "").strip() or DEFAULT_UPDATE_URL
 _update_info = None  # populated by the background check if a newer version exists
 
 # Auto-shutdown: the open page sends a heartbeat to /ping. If the heartbeat
@@ -266,7 +266,7 @@ PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Review Scraper</title>
+<title>Feedback Fetcher</title>
 <style>
   :root { --bg:#f4f5f7; --card:#fff; --line:#e1e4e8; --accent:#2563eb; --text:#1f2328; --muted:#656d76; }
   * { box-sizing: border-box; }
@@ -363,7 +363,7 @@ PAGE = """<!DOCTYPE html>
 </head>
 <body>
 <header>
-  <h1>App Review Scraper</h1>
+  <h1>Feedback Fetcher</h1>
   <p>Pull Apple App Store &amp; Google Play reviews into a CSV.</p>
 </header>
 <main>
@@ -631,7 +631,7 @@ async function ping() {
     if (beat) {
       document.body.innerHTML = '<div style="max-width:520px;margin:80px auto;padding:24px;'
         + 'font-family:-apple-system,sans-serif;text-align:center;color:#656d76">'
-        + '<h2 style="color:#1f2328">Review Scraper has stopped</h2>'
+        + '<h2 style="color:#1f2328">Feedback Fetcher has stopped</h2>'
         + '<p>You can close this tab. To use it again, start the app and reload.</p></div>';
     }
   }
@@ -797,7 +797,7 @@ def main():
     server = make_server()
     port = server.server_address[1]  # actual port (may differ from preferred)
     url = f"http://{HOST}:{port}/"
-    print(f"\nApp Review Scraper running at {url}")
+    print(f"\nFeedback Fetcher running at {url}")
     print("Close the browser tab (or press Ctrl+C) to stop.\n")
     if not os.environ.get("NO_BROWSER"):
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()

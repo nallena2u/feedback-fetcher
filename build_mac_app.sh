@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build a double-clickable macOS app bundle (dist/Review Scraper.app) with PyInstaller.
+# Build a double-clickable macOS app bundle (dist/Feedback Fetcher.app) with PyInstaller.
 # Run this on a Mac. The resulting .app embeds Python + all dependencies, so
 # recipients do NOT need to install Python or run pip.
 #
@@ -20,38 +20,38 @@ echo "Using interpreter: $PY"
 "$PY" -m pip install -r requirements.txt
 
 # Start clean so a half-finished previous build can't leave stale output.
-rm -rf build dist "Review Scraper.spec"
+rm -rf build dist "Feedback Fetcher.spec"
 
 # certifi is bundled so SSL works inside the frozen app; the scraper deps are
 # collected so their data files come along.
 "$PY" -m PyInstaller \
-  --name "Review Scraper" \
+  --name "Feedback Fetcher" \
   --windowed \
   --onedir \
   --noconfirm \
-  --add-data "review_scraper.py:." \
+  --add-data "feedback_fetcher.py:." \
   --collect-all google_play_scraper \
   --collect-all app_store_web_scraper \
   --collect-all certifi \
   app.py
 
-# onedir+windowed emits BOTH dist/Review Scraper.app (self-contained) and a
-# redundant dist/Review Scraper/ collect folder. Drop the folder to avoid
+# onedir+windowed emits BOTH dist/Feedback Fetcher.app (self-contained) and a
+# redundant dist/Feedback Fetcher/ collect folder. Drop the folder to avoid
 # confusion — the .app is the only thing to ship.
-rm -rf "dist/Review Scraper"
+rm -rf "dist/Feedback Fetcher"
 
-if [ ! -d "dist/Review Scraper.app" ]; then
-  echo "ERROR: build did not produce dist/Review Scraper.app — check the log above." >&2
+if [ ! -d "dist/Feedback Fetcher.app" ]; then
+  echo "ERROR: build did not produce dist/Feedback Fetcher.app — check the log above." >&2
   exit 1
 fi
 
 # Package it for sending. ditto (not zip) preserves the bundle correctly.
-( cd dist && ditto -c -k --sequesterRsrc --keepParent "Review Scraper.app" "Review Scraper.zip" )
+( cd dist && ditto -c -k --sequesterRsrc --keepParent "Feedback Fetcher.app" "Feedback Fetcher.zip" )
 
 echo
 echo "Done."
-echo "  App:  dist/Review Scraper.app"
-echo "  Zip:  dist/Review Scraper.zip  (send this)"
+echo "  App:  dist/Feedback Fetcher.app"
+echo "  Zip:  dist/Feedback Fetcher.zip  (send this)"
 echo
 echo "Recipient: unzip, then RIGHT-CLICK the app → Open → Open (first launch only,"
 echo "because the app is unsigned)."

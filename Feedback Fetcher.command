@@ -1,5 +1,5 @@
 #!/bin/bash
-# Double-clickable launcher for the Review Scraper.
+# Double-clickable launcher for the Feedback Fetcher.
 # Closing this window stops the server.
 cd "$(dirname "$0")"
 if [ -x ".venv/bin/python" ]; then
@@ -8,7 +8,7 @@ else
   PY="python3"
 fi
 
-echo "Starting App Review Scraper…"
+echo "Starting Feedback Fetcher…"
 "$PY" app.py
 status=$?
 

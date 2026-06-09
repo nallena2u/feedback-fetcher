@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-App Store Review Scraper
+Feedback Fetcher
 Scrapes reviews from Apple App Store or Google Play Store with star rating filters
 """
 import ssl
@@ -222,13 +222,13 @@ def main():
         epilog="""
 Examples:
   # Scrape Apple App Store (only 1 and 2 star reviews)
-  python review_scraper.py --store apple --app-id 310633997 --stars 1 2
+  python feedback_fetcher.py --store apple --app-id 310633997 --stars 1 2
   
   # Scrape Google Play Store (all ratings)
-  python review_scraper.py --store google --app-id com.whatsapp --stars 1 2 3 4 5
+  python feedback_fetcher.py --store google --app-id com.whatsapp --stars 1 2 3 4 5
   
   # Scrape with custom output file
-  python review_scraper.py --store google --app-id com.instagram.android --stars 1 --output bad_reviews.csv
+  python feedback_fetcher.py --store google --app-id com.instagram.android --stars 1 --output bad_reviews.csv
         """
     )
     
